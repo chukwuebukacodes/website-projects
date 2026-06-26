@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CaptionPro – WhatsApp Post Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #25D366;
+    --green-dark: #128C7E;
+    --green-light: #DCF8C6;
+    --gold: #F59E0B;
+    --gold-light: #FEF3C7;
+    --navy: #0F172A;
+    --navy-mid: #1E293B;
+    --navy-soft: #334155;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --text-hint: #94A3B8;
+    --surface: #FFFFFF;
+    --surface-2: #F8FAFC;
+    --surface-3: #F1F5F9;
+    --border: rgba(15,23,42,0.10);
+    --border-strong: rgba(15,23,42,0.18);
+    --radius: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --shadow: 0 2px 16px rgba(15,23,42,0.08);
+    --shadow-lg: 0 8px 40px rgba(15,23,42,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #0F172A;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .phone-shell {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background: var(--surface-2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP NAV ── */
+  .topbar {
+    background: var(--green-dark);
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--green);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .topbar-icon svg { width: 18px; height: 18px; fill: white; }
+  .topbar h1 { font-size: 17px; font-weight: 700; color: white; letter-spacing: -0.3px; }
+  .topbar p { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 1px; }
+  .trial-badge {
+    background: var(--gold);
+    color: #78350F;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .trial-badge:hover { transform: scale(1.04); }
+  .trial-badge.pro { background: white; color: var(--green-dark); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; }
+
+  /* ── HOME SCREEN ── */
+  .hero-section {
+    background: linear-gradient(160deg, #128C7E 0%, #075E54 100%);
+    padding: 28px 20px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    right: -30px; bottom: -30px;
+    width: 160px; height: 160px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .hero-tag span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; }
+  .hero-section h2 { font-size: 26px; font-weight: 800; color: white; line-height: 1.25; letter-spacing: -0.5px; }
+  .hero-section h2 em { color: #A7F3D0; font-style: normal; }
+  .hero-section p { font-size: 14px; color: rgba(255,255,255,0.75); margin-top: 10px; line-height: 1.6; }
+
+  .trial-bar {
+    background: var(--gold-light);
+    border: 1.5px solid var(--gold);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 16px 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .trial-bar-left { display: flex; align-items: center; gap: 10px; }
+  .trial-bar svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .trial-bar p { font-size: 13px; font-weight: 600; color: #78350F; }
+  .trial-bar span { font-size: 12px; color: #92400E; }
+  .upgrade-btn {
+    background: var(--gold);
+    color: #78350F;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s;
+  }
+  .upgrade-btn:hover { transform: scale(1.04); }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 20px 20px 10px;
+  }
+
+  /* Category Grid */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 16px;
+  }
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .cat-card:active { transform: scale(0.97); }
+  .cat-card.selected { border-color: var(--green); background: #F0FDF4; }
+  .cat-emoji { font-size: 28px; margin-bottom: 8px; display: block; }
+  .cat-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .cat-desc { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+  .cat-lock {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--surface-3);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .cat-lock.pro { background: var(--gold-light); color: #92400E; }
+
+  .generate-section { padding: 16px; }
+  .generate-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+  }
+  .form-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: block; }
+  .form-input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+  }
+  .form-input:focus { border-color: var(--green); background: white; }
+  .form-input::placeholder { color: var(--text-hint); }
+  .form-row { margin-bottom: 14px; }
+  .tone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .tone-btn {
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .tone-btn:hover { border-color: var(--green); color: var(--green-dark); }
+  .tone-btn.active { background: #F0FDF4; border-color: var(--green); color: var(--green-dark); }
+
+  .main-btn {
+    width: 100%;
+    background: var(--green-dark);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.18s;
+    margin-top: 16px;
+  }
+  .main-btn:hover { background: #075E54; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(18,140,126,0.35); }
+  .main-btn:active { transform: scale(0.98); }
+  .main-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  /* ── RESULTS SCREEN ── */
+  .results-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .back-btn {
+    width: 36px; height: 36px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text);
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .back-btn:hover { background: var(--surface-3); }
+  .results-title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .results-sub { font-size: 12px; color: var(--text-muted); }
+
+  .results-list { padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 14px; }
+
+  .caption-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+  }
+  .caption-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .caption-type {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--green-dark);
+    text-transform: uppercase;
+  }
+  .caption-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .icon-btn:hover { background: var(--green-light); border-color: var(--green); }
+  .icon-btn.copied { background: var(--green-light); border-color: var(--green); }
+  .copied-toast {
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 7px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .copied-toast.show { opacity: 1; }
+
+  .caption-body { padding: 14px; }
+  .caption-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .caption-lock {
+    padding: 18px 14px;
+    text-align: center;
+    background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 5px, var(--surface-3) 5px, var(--surface-3) 10px);
+  }
+  .lock-icon { font-size: 24px; margin-bottom: 8px; }
+  .caption-lock p { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .caption-lock small { font-size: 12px; color: var(--text-hint); }
+
+  .share-strip {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 430px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    z-index: 50;
+  }
+  .share-btn {
+    flex: 1;
+    background: #25D366;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .share-btn:hover { background: var(--green-dark); }
+  .refer-btn {
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .refer-btn:hover { border-color: var(--green); color: var(--green-dark); }
+
+  /* ── UPGRADE SCREEN ── */
+  .upgrade-screen { background: var(--surface-2); }
+  .upgrade-hero {
+    background: linear-gradient(160deg, #075E54 0%, #0F172A 100%);
+    padding: 32px 24px 40px;
+    text-align: center;
+  }
+  .upgrade-crown { font-size: 52px; margin-bottom: 12px; }
+  .upgrade-hero h2 { font-size: 26px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+  .upgrade-hero p { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 8px; }
+
+  .plans-wrap { padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .plan-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+  }
+  .plan-card.featured { border-color: var(--green); }
+  .plan-card:hover { border-color: var(--green); box-shadow: var(--shadow); }
+  .plan-popular {
+    position: absolute;
+    top: -1px; right: 14px;
+    background: var(--green);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 0 0 10px 10px;
+  }
+  .plan-name { font-size: 16px; font-weight: 800; color: var(--text); }
+  .plan-price {
+    display: flex; align-items: baseline; gap: 4px;
+    margin: 8px 0;
+  }
+  .plan-naira { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+  .plan-amount { font-size: 32px; font-weight: 800; color: var(--green-dark); }
+  .plan-period { font-size: 13px; color: var(--text-muted); }
+  .plan-perks { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+  .perk {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 13px; color: var(--text);
+  }
+  .perk-tick { color: var(--green); font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  .bank-box {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 0 16px 8px;
+  }
+  .bank-box h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .bank-detail { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .bank-detail:last-child { border-bottom: none; }
+  .bank-key { font-size: 13px; color: var(--text-muted); }
+  .bank-val { font-size: 13px; font-weight: 700; color: var(--text); }
+  .bank-copy { font-size: 11px; color: var(--green-dark); font-weight: 600; cursor: pointer; }
+
+  .confirm-btn {
+    width: calc(100% - 32px);
+    margin: 0 16px 20px;
+    background: var(--green-dark);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .confirm-btn:hover { background: #075E54; box-shadow: 0 4px 20px rgba(7,94,84,0.4); }
+
+  /* ── REFER SCREEN ── */
+  .refer-screen { background: var(--surface-2); }
+  .refer-hero {
+    background: linear-gradient(160deg, #F59E0B 0%, #D97706 100%);
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .refer-hero h2 { font-size: 24px; font-weight: 800; color: white; }
+  .refer-hero p { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 8px; }
+  .refer-steps { padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+  .refer-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    background: var(--green-dark);
+    color: white;
+    font-size: 14px; font-weight: 800;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text h4 { font-size: 14px; font-weight: 700; color: var(--text); }
+  .step-text p { font-size: 13px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
+  .refer-link-box {
+    background: var(--surface);
+    border: 1.5px dashed var(--green);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin: 0 16px;
+    text-align: center;
+  }
+  .refer-link-box p { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+  .refer-link {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green-dark);
+    background: var(--surface-2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    word-break: break-all;
+    margin-bottom: 12px;
+  }
+  .copy-link-btn {
+    width: 100%;
+    background: var(--green);
+    color: white;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .copy-link-btn:hover { background: var(--green-dark); }
+  .earn-note {
+    margin: 14px 16px;
+    background: var(--gold-light);
+    border: 1.5px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 13px;
+    color: #78350F;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .earn-note strong { font-weight: 700; }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-box {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    text-align: center;
+    max-width: 280px;
+    width: 90%;
+  }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 4px solid var(--surface-3);
+    border-top-color: var(--green-dark);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-box h3 { font-size: 17px; font-weight: 700; color: var(--text); }
+  .loading-box p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+  /* ── NAV BAR ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 430px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 80;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0 14px;
+    cursor: pointer;
+    gap: 4px;
+    transition: all 0.15s;
+  }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--text-hint); }
+  .nav-item.active .nav-label { color: var(--green-dark); }
+  .nav-item.active .nav-icon { filter: none; }
+
+  /* Scrollable content above fixed nav */
+  .screen-scroll { flex: 1; overflow-y: auto; padding-bottom: 70px; }
+
+  .whatsapp-logo { display: inline-block; }
+  .whatsapp-logo svg { width: 18px; height: 18px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="phone-shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.52 3.48A11.95 11.95 0 0012 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.18-1.62A11.95 11.95 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.82 0-3.6-.49-5.14-1.4l-.37-.22-3.77.99 1-3.67-.24-.38A10 10 0 0112 2c2.67 0 5.18 1.04 7.07 2.93A9.94 9.94 0 0122 12c0 5.51-4.49 10-10 10zm5.46-7.42c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.41-1.5-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.1 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.89.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg>
+      </div>
+      <div>
+        <h1>CaptionPro</h1>
+        <p>WhatsApp Post Generator</p>
+      </div>
+    </div>
+    <div class="trial-badge" id="trialBadge" onclick="showScreen('upgrade')">2 Days Free</div>
+  </div>
+
+  <!-- ══ HOME SCREEN ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="screen-scroll">
+
+      <div class="hero-section">
+        <div class="hero-tag"><span></span> AI-Powered</div>
+        <h2>Ready-to-post captions for <em>your business</em></h2>
+        <p>Pick your business type, describe your post, and get 5 professional WhatsApp captions in seconds.</p>
+      </div>
+
+      <div class="trial-bar" id="trialBar">
+        <div class="trial-bar-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          <div>
+            <p id="trialText">Free trial: <b id="daysLeft">2 days</b> left</p>
+            <span>Upgrade to unlock all categories</span>
+          </div>
+        </div>
+        <button class="upgrade-btn" onclick="showScreen('upgrade')">Upgrade</button>
+      </div>
+
+      <div class="section-label">Choose Your Business</div>
+      <div class="cat-grid">
+        <div class="cat-card" data-cat="food" onclick="selectCat(this)">
+          <span class="cat-emoji">🍔</span>
+          <div class="cat-name">Food & Drinks</div>
+          <div class="cat-desc">Restaurant, kitchen, bakery</div>
+        </div>
+        <div class="cat-card" data-cat="fashion" onclick="selectCat(this)">
+          <span class="cat-emoji">👗</span>
+          <div class="cat-name">Fashion</div>
+          <div class="cat-desc">Clothing, shoes, accessories</div>
+        </div>
+        <div class="cat-card" data-cat="beauty" onclick="selectCat(this)">
+          <span class="cat-emoji">💅</span>
+          <div class="cat-name">Beauty & Hair</div>
+          <div class="cat-desc">Salon, makeup, skincare</div>
+        </div>
+        <div class="cat-card" data-cat="tech" onclick="selectCat(this)">
+          <span class="cat-emoji">💻</span>
+          <div class="cat-name">Tech & Services</div>
+          <div class="cat-desc">Repairs, IT, printing</div>
+        </div>
+        <div class="cat-card pro-only" data-cat="realEstate" onclick="checkProCat(this)">
+          <span class="cat-emoji">🏠</span>
+          <div class="cat-name">Real Estate</div>
+          <div class="cat-desc">Rent, sales, properties</div>
+          <div class="cat-lock pro">PRO</div>
+        </div>
+        <div class="cat-card pro-only" data-cat="health" onclick="checkProCat(this)">
+          <span class="cat-emoji">💊</span>
+          <div class="cat-name">Health & Pharma</div>
+          <div class="cat-desc">Clinic, pharmacy, wellness</div>
+          <div class="cat-lock pro">PRO</div>
+        </div>
+        <div class="cat-card pro-only" data-cat="logistics" onclick="checkProCat(this)">
+          <span class="cat-emoji">🚚</span>
+          <div class="cat-name">Logistics & Delivery</div>
+          <div class="cat-desc">Courier, dispatch, freight</div>
+          <div class="cat-lock pro">PRO</div>
+        </div>
+        <div class="cat-card pro-only" data-cat="general" onclick="checkProCat(this)">
+          <span class="cat-emoji">🏪</span>
+          <div class="cat-name">General Store</div>
+          <div class="cat-desc">Supermarket, provision, shop</div>
+          <div class="cat-lock pro">PRO</div>
+        </div>
+      </div>
+
+      <div class="generate-section">
+        <div class="generate-form">
+          <div class="form-row">
+            <label class="form-label">Your business name</label>
+            <input class="form-input" id="bizName" placeholder="e.g. Mama Cee's Kitchen" />
+          </div>
+          <div class="form-row">
+            <label class="form-label">What are you promoting today?</label>
+            <textarea class="form-input" id="postIdea" rows="3" placeholder="e.g. Weekend jollof rice promo, buy 2 get 1 free until Sunday"></textarea>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Caption tone</label>
+            <div class="tone-grid">
+              <div class="tone-btn active" onclick="setTone(this, 'professional')">📊 Professional</div>
+              <div class="tone-btn" onclick="setTone(this, 'funny')">😄 Funny</div>
+              <div class="tone-btn" onclick="setTone(this, 'urgent')">🔥 Urgent</div>
+              <div class="tone-btn" onclick="setTone(this, 'friendly')">😊 Friendly</div>
+              <div class="tone-btn" onclick="setTone(this, 'motivational')">💪 Hype</div>
+              <div class="tone-btn" onclick="setTone(this, 'storytelling')">📖 Story</div>
+            </div>
+          </div>
+          <button class="main-btn" id="generateBtn" onclick="generateCaptions()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            Generate Captions
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ RESULTS SCREEN ══ -->
+  <div class="screen" id="screen-results">
+    <div class="results-header">
+      <div class="back-btn" onclick="showScreen('home')">←</div>
+      <div>
+        <div class="results-title">Your Captions 🎉</div>
+        <div class="results-sub" id="resultsSubtitle">5 captions ready to post</div>
+      </div>
+    </div>
+    <div class="screen-scroll" style="padding-bottom: 100px;">
+      <div class="results-list" id="resultsList"></div>
+    </div>
+    <div class="share-strip">
+      <button class="share-btn" onclick="shareAll()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20.52 3.48A11.95 11.95 0 0012 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.18-1.62A11.95 11.95 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.82 0-3.6-.49-5.14-1.4l-.37-.22-3.77.99 1-3.67-.24-.38A10 10 0 0112 2c2.67 0 5.18 1.04 7.07 2.93A9.94 9.94 0 0122 12c0 5.51-4.49 10-10 10zm5.46-7.42c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.41-1.5-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.1 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.89.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg>
+        Share on WhatsApp
+      </button>
+      <button class="refer-btn" onclick="showScreen('refer')">
+        🔗 Earn
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ UPGRADE SCREEN ══ -->
+  <div class="screen" id="screen-upgrade">
+    <div class="screen-scroll">
+      <div class="upgrade-hero">
+        <div class="upgrade-crown">👑</div>
+        <h2>Go PRO &amp; unlock everything</h2>
+        <p>More categories, unlimited captions, no watermark</p>
+      </div>
+
+      <div class="plans-wrap">
+        <div class="plan-card" onclick="selectPlan('monthly', 3000)">
+          <div class="plan-name">Monthly Plan</div>
+          <div class="plan-price">
+            <span class="plan-naira">₦</span>
+            <span class="plan-amount">3,000</span>
+            <span class="plan-period">/month</span>
+          </div>
+          <div class="plan-perks">
+            <div class="perk"><span class="perk-tick">✓</span> All 8 business categories</div>
+            <div class="perk"><span class="perk-tick">✓</span> Unlimited caption generation</div>
+            <div class="perk"><span class="perk-tick">✓</span> Story captions + Hashtags</div>
+            <div class="perk"><span class="perk-tick">✓</span> No watermark</div>
+          </div>
+        </div>
+
+        <div class="plan-card featured" onclick="selectPlan('yearly', 20000)">
+          <div class="plan-popular">🔥 Best Value</div>
+          <div class="plan-name">Yearly Plan</div>
+          <div class="plan-price">
+            <span class="plan-naira">₦</span>
+            <span class="plan-amount">20,000</span>
+            <span class="plan-period">/year</span>
+          </div>
+          <div class="plan-perks">
+            <div class="perk"><span class="perk-tick">✓</span> Everything in Monthly</div>
+            <div class="perk"><span class="perk-tick">✓</span> Priority support on WhatsApp</div>
+            <div class="perk"><span class="perk-tick">✓</span> New categories added free</div>
+            <div class="perk"><span class="perk-tick">✓</span> Save <b>₦16,000</b> vs monthly</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bank-box" id="bankBox" style="display:none">
+        <h3>💳 Pay via Bank Transfer</h3>
+        <div class="bank-detail">
+          <span class="bank-key">Bank</span>
+          <span class="bank-val">OPay</span>
+        </div>
+        <div class="bank-detail">
+          <span class="bank-key">Account Number</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="bank-val" id="bankAcct">9063407632</span>
+            <span class="bank-copy" onclick="copyBank()">Copy</span>
+          </div>
+        </div>
+        <div class="bank-detail">
+          <span class="bank-key">Account Name</span>
+          <span class="bank-val">CharlesTech</span>
+        </div>
+        <div class="bank-detail">
+          <span class="bank-key">Amount</span>
+          <span class="bank-val" id="bankAmount">₦3,000</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.5">After payment, send your name + screenshot to WhatsApp: <b>+2349063407632</b> and your account will be activated within 2 hours.</p>
+      </div>
+
+      <button class="confirm-btn" id="confirmBtn" onclick="confirmPayment()" style="display:none">
+        ✅ I've Made Payment — Notify Charles
+      </button>
+
+      <div style="height:80px"></div>
+    </div>
+  </div>
+
+  <!-- ══ REFER SCREEN ══ -->
+  <div class="screen" id="screen-refer">
+    <div class="screen-scroll">
+      <div class="refer-hero">
+        <h2>💰 Share & Earn</h2>
+        <p>Share CaptionPro with friends — earn ₦500 for every person who upgrades</p>
+      </div>
+      <div class="refer-steps">
+        <div class="refer-step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <h4>Copy your unique link</h4>
+            <p>Every link has your ID so you get credit when someone pays</p>
+          </div>
+        </div>
+        <div class="refer-step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <h4>Share on WhatsApp, Facebook, anywhere</h4>
+            <p>Post it to your status, groups, and DMs. The more you share, the more you earn</p>
+          </div>
+        </div>
+        <div class="refer-step">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <h4>Get ₦500 per upgrade</h4>
+            <p>When someone clicks your link and pays, Charles transfers your commission</p>
+          </div>
+        </div>
+      </div>
+      <div class="refer-link-box">
+        <p>YOUR REFERRAL LINK</p>
+        <div class="refer-link" id="referLink">captionpro.ng/ref/USER123</div>
+        <button class="copy-link-btn" onclick="copyReferLink()">📋 Copy My Link</button>
+      </div>
+      <div class="earn-note">
+        <strong>📲 Share this on your WhatsApp status today!</strong><br>
+        Even 5 people upgrading = <strong>₦2,500 in your account</strong> — no experience needed.
+      </div>
+      <div style="height:80px"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav" id="bottomNav">
+    <div class="nav-item active" id="nav-home" onclick="showScreen('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" id="nav-upgrade" onclick="showScreen('upgrade')">
+      <span class="nav-icon">👑</span>
+      <span class="nav-label">Upgrade</span>
+    </div>
+    <div class="nav-item" id="nav-refer" onclick="showScreen('refer')">
+      <span class="nav-icon">🔗</span>
+      <span class="nav-label">Earn</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <h3>Writing your captions...</h3>
+    <p>AI is crafting professional posts for your business</p>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let selectedCat = null;
+let selectedTone = 'professional';
+let isPro = false;
+let selectedPlanName = '';
+let selectedPlanAmount = '';
+let generatedCaptions = [];
+const USER_REF_ID = 'USR' + Math.random().toString(36).substr(2,6).toUpperCase();
+
+// ── SCREEN MANAGEMENT ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('nav-' + name);
+  if (nav) nav.classList.add('active');
+  if (name === 'refer') {
+    document.getElementById('referLink').textContent = 'captionpro.ng/ref/' + USER_REF_ID;
+  }
+  if (name === 'results') {
+    document.querySelector('.bottom-nav').style.display = 'none';
+  } else {
+    document.querySelector('.bottom-nav').style.display = 'flex';
+  }
+  window.scrollTo(0,0);
+}
+
+// ── CATEGORY ──
+function selectCat(el) {
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = el.dataset.cat;
+}
+
+function checkProCat(el) {
+  if (isPro) { selectCat(el); return; }
+  showScreen('upgrade');
+}
+
+// ── TONE ──
+function setTone(el, tone) {
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedTone = tone;
+}
+
+// ── GENERATE ──
+async function generateCaptions() {
+  const bizName = document.getElementById('bizName').value.trim();
+  const postIdea = document.getElementById('postIdea').value.trim();
+  if (!selectedCat) { alert('Please choose your business category first'); return; }
+  if (!postIdea) { alert('Tell us what you want to promote'); return; }
+
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  const catLabels = {
+    food: 'Food & Drinks business',
+    fashion: 'Fashion & Clothing business',
+    beauty: 'Beauty & Hair salon',
+    tech: 'Tech & Repair services',
+    realEstate: 'Real Estate agency',
+    health: 'Health & Pharmacy',
+    logistics: 'Logistics & Delivery',
+    general: 'General Store / Supermarket'
+  };
+
+  const bizLabel = catLabels[selectedCat] || 'Small business';
+  const name = bizName || 'the business';
+
+  const prompt = `You are a top Nigerian social media copywriter. Write exactly 5 WhatsApp business captions for "${name}", a ${bizLabel}.
+
+Topic/Promotion: ${postIdea}
+Tone: ${selectedTone}
+
+Rules:
+- Write in Nigerian English (relatable, direct, real)
+- Each caption must be complete and ready to paste on WhatsApp
+- Include emojis where they fit naturally
+- 2 captions should end with a clear call-to-action (e.g. "Call/WhatsApp us now", "Order today", "DM to order")
+- 1 caption should be a short punchy caption (under 3 lines)
+- 1 caption should tell a mini story or customer scenario
+- 1 caption should use urgency (e.g. limited time, slots, stock)
+- Keep each caption between 4–12 lines
+
+Return ONLY a JSON array in this format, no markdown, no extra text:
+[
+  {"type":"Punchy & Short","text":"..."},
+  {"type":"Story Caption","text":"..."},
+  {"type":"Urgency Post","text":"..."},
+  {"type":"Call-to-Action","text":"..."},
+  {"type":"Engagement Post","text":"..."}
+]`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '';
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+    generatedCaptions = JSON.parse(cleaned);
+
+  } catch (e) {
+    generatedCaptions = getFallbackCaptions(bizName, postIdea);
+  }
+
+  document.getElementById('loadingOverlay').classList.remove('show');
+  renderResults();
+  showScreen('results');
+}
+
+function getFallbackCaptions(biz, promo) {
+  const name = biz || 'Our store';
+  return [
+    { type: 'Punchy & Short', text: `🔥 ${name}\n\n${promo}\n\nDon't sleep on this!\nWhatsApp us now ⬇️` },
+    { type: 'Story Caption', text: `Imagine walking in, grabbing exactly what you need, and leaving with a smile 😊\n\nThat's the ${name} experience.\n\n${promo}\n\nCome see us today!` },
+    { type: 'Urgency Post', text: `⏰ LIMITED TIME ONLY!\n\n${promo}\n\nThis offer won't last. Once it's gone, it's gone!\n\nCall/WhatsApp NOW to grab yours 📲` },
+    { type: 'Call-to-Action', text: `✅ ${name} is here for you!\n\n${promo}\n\n💬 DM us to order\n📞 Call to ask questions\n🚀 Delivery available!` },
+    { type: 'Engagement Post', text: `Which one is YOUR favourite?\n\n${promo}\n\nComment below or send us a WhatsApp 📩\nWe love hearing from you! 💚` }
+  ];
+}
+
+// ── RENDER RESULTS ──
+function renderResults() {
+  const list = document.getElementById('resultsList');
+  const subtitle = document.getElementById('resultsSubtitle');
+  const freeLimit = 3;
+
+  subtitle.textContent = isPro ? `${generatedCaptions.length} captions ready` : `${freeLimit} free + ${generatedCaptions.length - freeLimit} locked`;
+
+  list.innerHTML = generatedCaptions.map((cap, i) => {
+    const isLocked = !isPro && i >= freeLimit;
+    return `
+    <div class="caption-card">
+      <div class="caption-card-top">
+        <span class="caption-type">${cap.type}</span>
+        ${!isLocked ? `
+        <div class="caption-actions">
+          <div class="icon-btn" onclick="copyCaption(this, ${i})" title="Copy">
+            📋
+            <span class="copied-toast" id="toast-${i}">Copied!</span>
+          </div>
+          <div class="icon-btn" onclick="shareCaption(${i})" title="Share to WhatsApp">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M20.52 3.48A11.95 11.95 0 0012 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.18-1.62A11.95 11.95 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.82 0-3.6-.49-5.14-1.4l-.37-.22-3.77.99 1-3.67-.24-.38A10 10 0 0112 2c2.67 0 5.18 1.04 7.07 2.93A9.94 9.94 0 0122 12c0 5.51-4.49 10-10 10zm5.46-7.42c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.41-1.5-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.1 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.89.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg>
+          </div>
+        </div>` : ''}
+      </div>
+      ${isLocked
+        ? `<div class="caption-lock">
+            <div class="lock-icon">🔒</div>
+            <p>Upgrade to unlock this caption</p>
+            <small>Get all 5 captions + 8 categories with PRO</small>
+            <button class="upgrade-btn" style="margin-top:12px;padding:9px 18px;border:none;cursor:pointer;border-radius:8px;font-size:13px;font-weight:700;" onclick="showScreen('upgrade')">Unlock — ₦3,000/month</button>
+          </div>`
+        : `<div class="caption-body"><p class="caption-text">${escHtml(cap.text)}</p></div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyCaption(btn, idx) {
+  navigator.clipboard.writeText(generatedCaptions[idx].text).then(() => {
+    btn.classList.add('copied');
+    const toast = document.getElementById('toast-' + idx);
+    toast.classList.add('show');
+    setTimeout(() => { btn.classList.remove('copied'); toast.classList.remove('show'); }, 2000);
+  });
+}
+
+function shareCaption(idx) {
+  const text = encodeURIComponent(generatedCaptions[idx].text);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+function shareAll() {
+  const allText = generatedCaptions.filter((_,i) => isPro || i < 3).map(c => `*${c.type}*\n\n${c.text}`).join('\n\n───────────────\n\n');
+  const encoded = encodeURIComponent(allText);
+  window.open('https://wa.me/?text=' + encoded, '_blank');
+}
+
+// ── UPGRADE ──
+function selectPlan(name, amount) {
+  selectedPlanName = name;
+  selectedPlanAmount = amount;
+  document.getElementById('bankAmount').textContent = '₦' + amount.toLocaleString();
+  document.getElementById('bankBox').style.display = 'block';
+  document.getElementById('confirmBtn').style.display = 'block';
+  document.getElementById('bankBox').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyBank() {
+  navigator.clipboard.writeText('9063407632');
+  alert('Account number copied!');
+}
+
+function confirmPayment() {
+  const msg = encodeURIComponent(
+    `Hello Charles! I just paid ₦${selectedPlanAmount.toLocaleString()} for CaptionPro ${selectedPlanName === 'yearly' ? 'Yearly' : 'Monthly'} Plan.\n\nPlease activate my account 🙏\n\n(Attaching payment screenshot)`
+  );
+  window.open('https://wa.me/2349063407632?text=' + msg, '_blank');
+}
+
+// ── REFER ──
+function copyReferLink() {
+  const link = document.getElementById('referLink').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.copy-link-btn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy My Link'; }, 2000);
+  });
+}
+
+// ── TRIAL COUNTDOWN ──
+(function initTrial() {
+  const key = 'captionpro_install';
+  if (!localStorage.getItem(key)) localStorage.setItem(key, Date.now());
+  function updateTrial() {
+    const installed = parseInt(localStorage.getItem(key));
+    const days2 = 2 * 24 * 60 * 60 * 1000;
+    const elapsed = Date.now() - installed;
+    if (elapsed >= days2) {
+      document.getElementById('daysLeft').textContent = '0 days — Upgrade now!';
+      document.getElementById('trialBar').style.borderColor = '#EF4444';
+      document.getElementById('trialBadge').textContent = 'Trial Ended';
+      document.getElementById('trialBadge').style.background = '#FEE2E2';
+      document.getElementById('trialBadge').style.color = '#991B1B';
+    } else {
+      const rem = days2 - elapsed;
+      const h = Math.floor(rem / 3600000);
+      const d = Math.floor(h / 24);
+      const hr = h % 24;
+      document.getElementById('daysLeft').textContent = d > 0 ? `${d}d ${hr}h` : `${hr}h`;
+    }
+  }
+  updateTrial();
+  setInterval(updateTrial, 60000);
+})();
+</script>
+</body>
+</html>
